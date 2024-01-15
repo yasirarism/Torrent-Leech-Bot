@@ -63,8 +63,7 @@ async def youtube_dl_call_back(bot, update):
             revoke=True
         )
         return
-    save_ytdl_json_path = user_working_dir + \
-        "/" + str("ytdleech") + ".json"
+    save_ytdl_json_path = f"{user_working_dir}/ytdleech.json"
     try:
         with open(save_ytdl_json_path, "r", encoding="utf8") as f:
             response_json = json.load(f)
@@ -96,8 +95,8 @@ async def youtube_dl_call_back(bot, update):
     )
     description = "@Universal_leecher_Robot"
     if "fulltitle" in response_json:
-        description = response_json["fulltitle"][0:1021]
-        # escape Markdown and special characters
+        description = response_json["fulltitle"][:1021]
+            # escape Markdown and special characters
     #
     tmp_directory_for_each_user = os.path.join(
         DOWNLOAD_LOCATION,
@@ -132,7 +131,7 @@ async def youtube_dl_call_back(bot, update):
                     acodec = for_mat.get("acodec")
                     vcodec = for_mat.get("vcodec")
                     if acodec == "none" or vcodec == "none":
-                        minus_f_format = youtube_dl_format + "+bestaudio"
+                        minus_f_format = f"{youtube_dl_format}+bestaudio"
                     break
         command_to_exec = [
             "youtube-dl",
@@ -143,14 +142,10 @@ async def youtube_dl_call_back(bot, update):
             "-o", download_directory,
             # "--external-downloader", "aria2c"
         ]
-    #
-    command_to_exec.append("--no-warnings")
-    # command_to_exec.append("--quiet")
-    command_to_exec.append("--restrict-filenames")
+    command_to_exec.extend(("--no-warnings", "--restrict-filenames"))
     #
     if "hotstar" in youtube_dl_url:
-        command_to_exec.append("--geo-bypass-country")
-        command_to_exec.append("IN")
+        command_to_exec.extend(("--geo-bypass-country", "IN"))
     LOGGER.info(command_to_exec)
     start = datetime.now()
     process = await asyncio.create_subprocess_exec(
@@ -199,7 +194,7 @@ async def youtube_dl_call_back(bot, update):
                     os.rename(e, fi_le)
                     gaut_am = os.path.basename(fi_le)
                     LOGGER.info(gaut_am)
-                
+
         G_DRIVE = False
         txt = update.message.reply_to_message.text
         print(txt)
@@ -227,7 +222,7 @@ async def youtube_dl_call_back(bot, update):
                 {},
                 True
             )
-          
+
         '''  
         final_response = await upload_to_tg(
             update.message,

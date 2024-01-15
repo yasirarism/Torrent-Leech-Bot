@@ -59,7 +59,7 @@ async def button(bot, update: CallbackQuery):
                 LOGGER.info(g_list)
                 g_del_list = list(set(g_list)-set(g_d_list))
                 LOGGER.info(g_del_list)
-                if len(g_del_list) != 0:
+                if g_del_list:
                     for f in g_del_list:
                         if os.path.isfile(f):
                             os.remove(f)
@@ -68,8 +68,8 @@ async def button(bot, update: CallbackQuery):
                     await update.message.edit_text(f"Deleted {len(g_del_list)} objects 😬")
                 else:
                     await update.message.edit_text("Nothing to clear 🙄")
-                # else:
-                #     await update.message.delete()
+                            # else:
+                            #     await update.message.delete()
     elif cb_data == "fuckingdo":
         if update.from_user.id in AUTH_CHANNEL:
             g_d_list = ['app.json', 'venv', 'rclone.conf', '.gitignore', '_config.yml', 'COPYING', 'Dockerfile', 'DOWNLOADS', 'Procfile', '.heroku', '.profile.d', 'rclone.jpg', 'README.md', 'requirements.txt', 'runtime.txt', 'start.sh', 'tobrot', 'gautam', 'Torrentleech-Gdrive.txt', 'vendor']
@@ -78,7 +78,7 @@ async def button(bot, update: CallbackQuery):
             LOGGER.info(g_list)
             g_del_list = list(set(g_list)-set(g_d_list))
             LOGGER.info(g_del_list)
-            if len(g_del_list) != 0:
+            if g_del_list:
                 for f in g_del_list:
                     if os.path.isfile(f):
                         os.remove(f)
@@ -87,6 +87,4 @@ async def button(bot, update: CallbackQuery):
                 await update.message.edit_text(f"Deleted {len(g_del_list)} objects 😬")
             else:
                 await update.message.edit_text("You are not allowed to do that 🤭")
-        elif cb_data == "fuckoff":
-            await update.message.edit_text("Okay! fine 🤬")
 				

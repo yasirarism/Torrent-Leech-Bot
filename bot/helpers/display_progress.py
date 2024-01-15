@@ -38,10 +38,23 @@ async def progress_for_pyrogram(
         elapsed_time = TimeFormatter(milliseconds=elapsed_time)
         time_to_completion = TimeFormatter(milliseconds=time_to_completion)
 
-        progress = "[{0}{1}] \n<b>➭Percentage:</b> <code>〘 {2}% 〙</code>\n".format(
-            ''.join([FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 12))]),
-            ''.join([UN_FINISHED_PROGRESS_STR for i in range(12 - math.floor(percentage / 12))]),
-            round(percentage, 2))
+        progress = (
+            "[{0}{1}] \n<b>➭Percentage:</b> <code>〘 {2}% 〙</code>\n".format(
+                ''.join(
+                    [
+                        FINISHED_PROGRESS_STR
+                        for _ in range(math.floor(percentage / 12))
+                    ]
+                ),
+                ''.join(
+                    [
+                        UN_FINISHED_PROGRESS_STR
+                        for _ in range(12 - math.floor(percentage / 12))
+                    ]
+                ),
+                round(percentage, 2),
+            )
+        )
 
         tmp = progress + "<b>➭Done✓:</b> <code> 〘 {0} 〙</code>\n<b>➭Total:</b> <code>〘 {1} 〙</code>\n<b>➭Speed:</b> <code>〘 {2}/s 〙</code>\n<b>➭Remaining</b>: <code>〘 {3} 〙</code>\n".format(
             humanbytes(current),
@@ -52,19 +65,9 @@ async def progress_for_pyrogram(
         )
         try:
             if not message.photo:
-                await message.edit_text(
-                    text="{}\n {}".format(
-                        ud_type,
-                        tmp
-                    )
-                )
+                await message.edit_text(text=f"{ud_type}\n {tmp}")
             else:
-                await message.edit_caption(
-                    caption="{}\n {}".format(
-                        ud_type,
-                        tmp
-                    )
-                )
+                await message.edit_caption(caption=f"{ud_type}\n {tmp}")
         except:
             pass
 
@@ -80,17 +83,19 @@ def humanbytes(size):
     while size > power:
         size /= power
         n += 1
-    return str(round(size, 2)) + " " + Dic_powerN[n] + 'B'
+    return f"{str(round(size, 2))} {Dic_powerN[n]}B"
 
 
 def TimeFormatter(milliseconds: int) -> str:
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + "d, ") if days else "") + \
-        ((str(hours) + "h, ") if hours else "") + \
-        ((str(minutes) + "m, ") if minutes else "") + \
-        ((str(seconds) + "s, ") if seconds else "") + \
-        ((str(milliseconds) + "ms, ") if milliseconds else "")
+    tmp = (
+        (f"{str(days)}d, " if days else "")
+        + (f"{str(hours)}h, " if hours else "")
+        + (f"{str(minutes)}m, " if minutes else "")
+        + (f"{str(seconds)}s, " if seconds else "")
+        + (f"{str(milliseconds)}ms, " if milliseconds else "")
+    )
     return tmp[:-2]

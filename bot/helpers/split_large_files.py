@@ -35,70 +35,30 @@ async def split_large_files(input_file):
     # if input_file.upper().endswith(("MKV", "MP4", "WEBM", "MP3", "M4A", "FLAC", "WAV")):
     """The below logic is DERPed, so removing temporarily
     """
-    if False:
-        # handle video / audio files here
-        metadata = extractMetadata(createParser(input_file))
-        total_duration = 0
-        if metadata.has("duration"):
-            total_duration = metadata.get('duration').seconds
-        # proprietary logic to get the seconds to trim (at)
-        LOGGER.info(total_duration)
-        total_file_size = os.path.getsize(input_file)
-        LOGGER.info(total_file_size)
-        minimum_duration = (total_duration / total_file_size) * (MAX_TG_SPLIT_FILE_SIZE)
-        LOGGER.info(minimum_duration)
-        # END: proprietary
-        start_time = 0
-        end_time = minimum_duration
-        base_name = os.path.basename(input_file)
-        input_extension = base_name.split(".")[-1]
-        LOGGER.info(input_extension)
-        i = 0
-        while end_time < total_duration:
-            LOGGER.info(i)
-            parted_file_name = ""
-            parted_file_name += str(i).zfill(5)
-            parted_file_name += str(base_name)
-            parted_file_name += "_PART_"
-            parted_file_name += str(start_time)
-            parted_file_name += "."
-            parted_file_name += str(input_extension)
-            output_file = os.path.join(new_working_directory, parted_file_name)
-            LOGGER.info(output_file)
-            LOGGER.info(await cult_small_video(
-                input_file,
-                output_file,
-                str(start_time),
-                str(end_time)
-            ))
-            start_time = end_time
-            end_time = end_time + minimum_duration
-            i = i + 1
-    else:
-        # handle normal files here
-        o_d_t = os.path.join(
-            new_working_directory,
-            os.path.basename(input_file)
-        )
-        o_d_t = o_d_t + "."
-        file_genertor_command = [
-            "split",
-            "--numeric-suffixes=1",
-            "--suffix-length=5",
-            f"--bytes={MAX_TG_SPLIT_FILE_SIZE}",
-            input_file,
-            o_d_t
-        ]
-        process = await asyncio.create_subprocess_exec(
-            *file_genertor_command,
-            # stdout must a pipe to be accessible as process.stdout
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        # Wait for the subprocess to finish
-        stdout, stderr = await process.communicate()
-        e_response = stderr.decode().strip()
-        t_response = stdout.decode().strip()
+    # handle normal files here
+    o_d_t = os.path.join(
+        new_working_directory,
+        os.path.basename(input_file)
+    )
+    o_d_t = f"{o_d_t}."
+    file_genertor_command = [
+        "split",
+        "--numeric-suffixes=1",
+        "--suffix-length=5",
+        f"--bytes={MAX_TG_SPLIT_FILE_SIZE}",
+        input_file,
+        o_d_t
+    ]
+    process = await asyncio.create_subprocess_exec(
+        *file_genertor_command,
+        # stdout must a pipe to be accessible as process.stdout
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    # Wait for the subprocess to finish
+    stdout, stderr = await process.communicate()
+    e_response = stderr.decode().strip()
+    t_response = stdout.decode().strip()
     return new_working_directory
 
 

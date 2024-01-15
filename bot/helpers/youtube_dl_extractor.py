@@ -33,8 +33,7 @@ async def extract_youtube_dl_formats(url, cf_name, yt_dl_user_name, yt_dl_pass_w
         url
     ]
     if "hotstar" in url:
-        command_to_exec.append("--geo-bypass-country")
-        command_to_exec.append("IN")
+        command_to_exec.extend(("--geo-bypass-country", "IN"))
     #
     if yt_dl_user_name is not None:
         command_to_exec.append("--username")
@@ -73,8 +72,7 @@ async def extract_youtube_dl_formats(url, cf_name, yt_dl_user_name, yt_dl_pass_w
         else:
             response_json.append(json.loads(x_reponse))
         # response_json = json.loads(x_reponse)
-        save_ytdl_json_path = user_working_dir + \
-            "/" + str("ytdleech") + ".json"
+        save_ytdl_json_path = (user_working_dir + "/" + "ytdleech") + ".json"
         with open(save_ytdl_json_path, "w", encoding="utf8") as outfile:
             json.dump(response_json, outfile, ensure_ascii=False)
         # logger.info(response_json)
@@ -99,9 +97,8 @@ async def extract_youtube_dl_formats(url, cf_name, yt_dl_user_name, yt_dl_pass_w
                     approx_file_size = ""
                     if "filesize" in formats:
                         approx_file_size = humanbytes(formats["filesize"])
-                    dipslay_str_uon = " " + format_string + " (" + format_ext.upper() + ") " + approx_file_size + " "
-                    cb_string_video = "{}|{}|{}".format(
-                        "video", format_id, format_ext)
+                    dipslay_str_uon = f" {format_string} ({format_ext.upper()}) {approx_file_size} "
+                    cb_string_video = f"video|{format_id}|{format_ext}"
                     ikeyboard = []
                     if "drive.google.com" in url:
                         if format_id == "source":
@@ -131,24 +128,35 @@ async def extract_youtube_dl_formats(url, cf_name, yt_dl_user_name, yt_dl_pass_w
                             ]
                     inline_keyboard.append(ikeyboard)
                 if duration is not None:
-                    cb_string_64 = "{}|{}|{}".format("audio", "64k", "mp3")
-                    cb_string_128 = "{}|{}|{}".format("audio", "128k", "mp3")
-                    cb_string = "{}|{}|{}".format("audio", "320k", "mp3")
-                    inline_keyboard.append([
-                        pyrogram.InlineKeyboardButton(
-                            "MP3 " + "(" + "64 kbps" + ")", callback_data=cb_string_64.encode("UTF-8")),
-                        pyrogram.InlineKeyboardButton(
-                            "MP3 " + "(" + "128 kbps" + ")", callback_data=cb_string_128.encode("UTF-8"))
-                    ])
-                    inline_keyboard.append([
-                        pyrogram.InlineKeyboardButton(
-                            "MP3 " + "(" + "320 kbps" + ")", callback_data=cb_string.encode("UTF-8"))
-                    ])
+                    cb_string_64 = 'audio|64k|mp3'
+                    cb_string_128 = f"audio|128k|mp3"
+                    cb_string = f"audio|320k|mp3"
+                    inline_keyboard.extend(
+                        (
+                            [
+                                pyrogram.InlineKeyboardButton(
+                                    "MP3 " + "(" + "64 kbps" + ")",
+                                    callback_data=cb_string_64.encode("UTF-8"),
+                                ),
+                                pyrogram.InlineKeyboardButton(
+                                    "MP3 " + "(" + "128 kbps" + ")",
+                                    callback_data=cb_string_128.encode(
+                                        "UTF-8"
+                                    ),
+                                ),
+                            ],
+                            [
+                                pyrogram.InlineKeyboardButton(
+                                    "MP3 " + "(" + "320 kbps" + ")",
+                                    callback_data=cb_string.encode("UTF-8"),
+                                )
+                            ],
+                        )
+                    )
             else:
                 format_id = current_r_json["format_id"]
                 format_ext = current_r_json["ext"]
-                cb_string_video = "{}|{}|{}".format(
-                    "video", format_id, format_ext)
+                cb_string_video = f"video|{format_id}|{format_ext}"
                 inline_keyboard.append([
                     pyrogram.InlineKeyboardButton(
                         "SVideo",

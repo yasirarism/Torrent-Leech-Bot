@@ -130,46 +130,47 @@ async def cancel_message_f(client, message):
         await message.delete()
 
 async def exec_message_f(client, message):
-    if message.from_user.id in AUTH_CHANNEL:
-        DELAY_BETWEEN_EDITS = 0.3
-        PROCESS_RUN_TIME = 100
-        cmd = message.text.split(" ", maxsplit=1)[1]
+    if message.from_user.id not in AUTH_CHANNEL:
+        return
+    DELAY_BETWEEN_EDITS = 0.3
+    PROCESS_RUN_TIME = 100
+    cmd = message.text.split(" ", maxsplit=1)[1]
 
-        reply_to_id = message.message_id
-        if message.reply_to_message:
-            reply_to_id = message.reply_to_message.message_id
+    reply_to_id = message.message_id
+    if message.reply_to_message:
+        reply_to_id = message.reply_to_message.message_id
 
-        start_time = time.time() + PROCESS_RUN_TIME
-        process = await asyncio.create_subprocess_shell(
-            cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        e = stderr.decode()
-        if not e:
-            e = "No Error"
-        o = stdout.decode()
-        if not o:
-            o = "No Output"
-        else:
-            _o = o.split("\n")
-            o = "`\n".join(_o)
-        OUTPUT = f"**QUERY:**\n__Command:__\n`{cmd}` \n__PID:__\n`{process.pid}`\n\n**stderr:** \n`{e}`\n**Output:**\n{o}"
+    start_time = time.time() + PROCESS_RUN_TIME
+    process = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+    e = stderr.decode()
+    if not e:
+        e = "No Error"
+    o = stdout.decode()
+    if not o:
+        o = "No Output"
+    else:
+        _o = o.split("\n")
+        o = "`\n".join(_o)
+    OUTPUT = f"**QUERY:**\n__Command:__\n`{cmd}` \n__PID:__\n`{process.pid}`\n\n**stderr:** \n`{e}`\n**Output:**\n{o}"
 
-        if len(OUTPUT) > MAX_MESSAGE_LENGTH:
-            with io.BytesIO(str.encode(OUTPUT)) as out_file:
-                out_file.name = "exec.text"
-                await client.send_document(
-                    chat_id=message.chat.id,
-                    document=out_file,
-                    caption=cmd,
-                    disable_notification=True,
-                    reply_to_message_id=reply_to_id
-                )
-            await message.delete()
-        else:
-            await message.reply_text(OUTPUT)
+    if len(OUTPUT) > MAX_MESSAGE_LENGTH:
+        with io.BytesIO(str.encode(OUTPUT)) as out_file:
+            out_file.name = "exec.text"
+            await client.send_document(
+                chat_id=message.chat.id,
+                document=out_file,
+                caption=cmd,
+                disable_notification=True,
+                reply_to_message_id=reply_to_id
+            )
+        await message.delete()
+    else:
+        await message.reply_text(OUTPUT)
 
 
 async def upload_document_f(client, message):
